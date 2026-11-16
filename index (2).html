@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TechStore - Catálogo de Tecnología</title>
+  <style>
+    :root { --bg:#0a0e1a; --panel:#111827; --panel2:#182033; --line:#26324d; --txt:#e6edf7; --mut:#8b9ab5;
+            --cyan:#22d3ee; --violet:#8b5cf6; --green:#34d399; --red:#f87171; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--txt);
+           background-image:radial-gradient(circle at 15% 0%, rgba(139,92,246,.18), transparent 40%),
+                            radial-gradient(circle at 90% 10%, rgba(34,211,238,.14), transparent 40%); }
+    nav { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+          padding:16px 24px; border-bottom:1px solid var(--line); background:rgba(10,14,26,.8); backdrop-filter:blur(8px); position:sticky; top:0; z-index:5; }
+    .logo { font-weight:800; font-size:1.3rem; letter-spacing:.5px; }
+    .logo span { background:linear-gradient(90deg,var(--cyan),var(--violet)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .buscador { display:flex; gap:8px; }
+    .buscador input { width:150px; }
+    input, select { background:var(--panel); border:1px solid var(--line); color:var(--txt); padding:9px 12px; border-radius:8px; font-size:.9rem; }
+    button { border:0; border-radius:8px; padding:9px 14px; font-weight:600; cursor:pointer; color:#fff;
+             background:linear-gradient(90deg,var(--violet),#6366f1); }
+    button:hover { filter:brightness(1.15); }
+    .layout { max-width:1200px; margin:0 auto; padding:24px; display:grid; grid-template-columns:240px 1fr; gap:24px; }
+    aside { display:flex; flex-direction:column; gap:16px; align-self:start; position:sticky; top:84px; }
+    .caja { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+    .caja h3 { margin:0 0 10px; font-size:.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--mut); }
+    .chip { display:block; width:100%; text-align:left; background:var(--panel2); color:var(--txt); margin-bottom:6px; border:1px solid transparent; }
+    .chip.activo { border-color:var(--cyan); color:var(--cyan); background:rgba(34,211,238,.08); }
+    select { width:100%; }
+    .info { color:var(--mut); font-size:.85rem; margin-bottom:14px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; transition:.2s; }
+    .card:hover { transform:translateY(-4px); border-color:var(--violet); }
+    .card.hit { border-color:var(--green); box-shadow:0 0 0 3px rgba(52,211,153,.25); }
+    .icono { height:90px; display:grid; place-items:center; font-size:2.6rem; background:linear-gradient(135deg,var(--panel2),#1e2a47); }
+    .cuerpo { padding:14px; }
+    .cat { font-size:.7rem; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; }
+    .cuerpo h4 { margin:6px 0 10px; font-size:.95rem; min-height:38px; }
+    .fila { display:flex; justify-content:space-between; align-items:center; }
+    .precio { font-size:1.25rem; font-weight:800; }
+    .stock { font-size:.75rem; padding:3px 8px; border-radius:99px; background:rgba(52,211,153,.15); color:var(--green); }
+    .stock.bajo { background:rgba(248,113,113,.15); color:var(--red); }
+    .id { font-size:.7rem; color:var(--mut); margin-top:8px; }
+    #msg { display:none; padding:12px 14px; border-radius:10px; margin-bottom:14px; font-size:.9rem; }
+    #msg.ok { display:block; background:rgba(52,211,153,.12); border:1px solid var(--green); }
+    #msg.err { display:block; background:rgba(248,113,113,.12); border:1px solid var(--red); }
+    @media (max-width:800px) { .layout { grid-template-columns:1fr; } aside { position:static; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">⚡ Tech<span>Store</span></div>
+    <div class="buscador">
+      <input type="number" id="idBuscar" placeholder="Buscar por ID" min="0">
+      <button onclick="buscar()">🔎 Buscar</button>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <aside>
+      <div class="caja">
+        <h3>Ordenar por</h3>
+        <button class="chip activo" data-c="precio" data-o="asc">💲 Menor precio</button>
+        <button class="chip" data-c="precio" data-o="desc">💎 Mayor precio</button>
+        <button class="chip" data-c="nombre" data-o="asc">🔤 Nombre A-Z</button>
+        <button class="chip" data-c="stock" data-o="desc">📦 Más stock</button>
+      </div>
+      <div class="caja">
+        <h3>Categoría</h3>
+        <select id="categoria"><option value="">Todas</option></select>
+      </div>
+    </aside>
+
+    <main>
+      <div id="msg"></div>
+      <div class="info" id="info"></div>
+      <div class="grid" id="grid"></div>
+    </main>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const ICONOS = {Computadoras:'💻',Periféricos:'🖱️',Monitores:'🖥️',Audio:'🎧',Almacenamiento:'💾',Móviles:'📱',
+                    Redes:'📡',Accesorios:'🔌',Wearables:'⌚',Componentes:'🧠'};
+    let campo = 'precio', orden = 'asc', resaltado = null;
+
+    async function cargar() {
+      const p = new URLSearchParams({ sort_by: campo, order: orden, categoria: $('categoria').value });
+      const res = await fetch('/api/productos?' + p);
+      const data = await res.json();
+      $('info').textContent = `${data.length} productos ordenados por ${campo} (${orden === 'asc' ? 'ascendente' : 'descendente'})`;
+      $('grid').innerHTML = data.map(p => `
+        <article class="card ${p.id === resaltado ? 'hit' : ''}">
+          <div class="icono">${ICONOS[p.categoria] || '🔧'}</div>
+          <div class="cuerpo">
+            <div class="cat">${esc(p.categoria)}</div>
+            <h4>${esc(p.nombre)}</h4>
+            <div class="fila">
+              <span class="precio">$${p.precio.toFixed(2)}</span>
+              <span class="stock ${p.stock < 15 ? 'bajo' : ''}">${p.stock} uds</span>
+            </div>
+            <div class="id">ID #${p.id}</div>
+          </div>
+        </article>`).join('');
+    }
+
+    async function buscar() {
+      const res = await fetch('/api/productos/buscar?id=' + encodeURIComponent($('idBuscar').value));
+      const d = await res.json();
+      const m = $('msg');
+      if (res.ok) {
+        m.className = 'ok';
+        m.innerHTML = `✅ <b>${esc(d.producto.nombre)}</b> — $${d.producto.precio.toFixed(2)} · posición ${d.posicion} · ${d.pasos} paso(s) de búsqueda binaria`;
+        resaltado = d.producto.id;
+      } else {
+        m.className = 'err';
+        m.textContent = '❌ ' + (d.mensaje || d.error);
+        resaltado = null;
+      }
+      await cargar();
+      const hit = document.querySelector('.card.hit');
+      if (hit) hit.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    document.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(b => b.classList.remove('activo'));
+      btn.classList.add('activo');
+      campo = btn.dataset.c; orden = btn.dataset.o;
+      cargar();
+    }));
+    $('categoria').addEventListener('change', cargar);
+    $('idBuscar').addEventListener('keydown', e => { if (e.key === 'Enter') buscar(); });
+
+    (async () => {
+      const cats = await (await fetch('/api/categorias')).json();
+      $('categoria').innerHTML += cats.map(c => `<option>${esc(c)}</option>`).join('');
+      cargar();
+    })();
+  </script>
+</body>
+</html>
