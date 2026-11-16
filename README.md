@@ -1,6 +1,7 @@
 # LGPII-T2-
 
-PAGINA WEB
+PAGINA WEB.
+
 ⚡ NovaNissi - Catálogo de Productos de Tecnología
 
 Aplicación web desacoplada compuesta por un backend en Flask que expone una API REST con algoritmos de ordenamiento y búsqueda, y un frontend en HTML5 + CSS + JavaScript que consume los datos con y los dibuja dinámicamente en el navegador sin recargar la página.fetch()
