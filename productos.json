@@ -1,9 +1,9 @@
 [
-  {"id": 14, "nombre": "Laptop Gamer 15.6\" RTX 4050", "categoria": "Computadoras", "precio": 1099.00, "stock": 8},
-  {"id": 3,  "nombre": "Mouse Inalámbrico Ergonómico", "categoria": "Periféricos", "precio": 24.90, "stock": 75},
+  {"id": 14, "nombre": "Laptop 15.6\" RTX 4050", "categoria": "Computadoras", "precio": 1099.00, "stock": 8},
+  {"id": 3,  "nombre": "Mouse Inalámbrico", "categoria": "Periféricos", "precio": 24.90, "stock": 75},
   {"id": 27, "nombre": "Teclado Mecánico RGB", "categoria": "Periféricos", "precio": 69.99, "stock": 40},
   {"id": 8,  "nombre": "Monitor 27\" 144Hz IPS", "categoria": "Monitores", "precio": 249.50, "stock": 15},
-  {"id": 21, "nombre": "Audífonos Bluetooth con Cancelación", "categoria": "Audio", "precio": 129.00, "stock": 32},
+  {"id": 21, "nombre": "Audífonos Bluetooth", "categoria": "Audio", "precio": 129.00, "stock": 32},
   {"id": 5,  "nombre": "SSD NVMe 1 TB", "categoria": "Almacenamiento", "precio": 79.90, "stock": 55},
   {"id": 32, "nombre": "Smartphone 5G 256 GB", "categoria": "Móviles", "precio": 599.00, "stock": 20},
   {"id": 11, "nombre": "Webcam Full HD 1080p", "categoria": "Periféricos", "precio": 39.95, "stock": 60},
